@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
       const accountDetails = await account.get();
       setUser(accountDetails);
     } catch (error) {
-      // console.info(error);
+      console.info(error);
     }
     setloading(false);
   };
