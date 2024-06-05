@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ID, Query, Role, Permission } from "appwrite";
-import { Trash2, User } from "react-feather";
+import { Trash2 } from "react-feather";
 import Header from "../components/Header";
 import client, {
   databases,
@@ -113,7 +113,7 @@ function Room() {
           </div>
         </form>
 
-        <div>
+        <div className="messages--container">
           {messages.map((message) => (
             <div key={message.$id} className="message--wrapper">
               <div className="message--header">

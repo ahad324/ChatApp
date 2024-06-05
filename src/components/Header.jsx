@@ -8,7 +8,7 @@ function Header() {
     <div id="header--wrapper">
       {user ? (
         <>
-          Welcome {user.name}
+          Welcome {user.name} 👋
           <LogOut onClick={handleUserLogout} className="header--link" />
         </>
       ) : (

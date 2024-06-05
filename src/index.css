@@ -1,190 +1,221 @@
 /* Global settings */
 
-:root{
-  --mainBgColor:rgba(20,20,31,11);
-  --secondaryBgColor:rgba(27,27,39,1);
-  --borderColor1:rgba(40,41,57,1);
-  --borderColor2:rgba(79,86,105,1);
-  --textColorMain:#fff;
-  --textColorSecondary:rgb(226, 227, 232);
-  --themeColorMain:rgba(219,26,90,1);
-  --themeColorSecondary:#386fd2;
+:root {
+  --mainBgColor: rgba(20, 20, 31, 11);
+  --secondaryBgColor: rgba(27, 27, 39, 1);
+  --borderColor1: rgba(40, 41, 57, 1);
+  --borderColor2: rgba(79, 86, 105, 1);
+  --textColorMain: #fff;
+  --textColorSecondary: rgb(226, 227, 232);
+  --themeColorMain: rgba(219, 26, 90, 1);
+  --themeColorSecondary: #386fd2;
+}
+
+/* WebKit Browsers */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--secondaryBgColor);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--themeColorMain);
+  border-radius: 10px;
+  border: 2px solid var(--secondaryBgColor);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--themeColorSecondary);
 }
 
 * {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    'Open Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+  Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--themeColorMain) var(--secondaryBgColor);
 }
 
-a{
-color: #40e0d0;
+a {
+  color: #40e0d0;
 }
 
-body{
+body {
   background-color: var(--mainBgColor);
   color: var(--textColorMain);
 }
 
-.container{
-max-width: 600px;
-margin:20px auto;
+.container {
+  max-width: 600px;
+  margin: 20px auto;
 }
 
 /* Login & Register Pages */
 
-.auth--container{
-height: 100vh;
-display: flex;
-align-items: center;
-justify-content: center;
+.auth--container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.form--wrapper{
-width: 600px;
-width: 600px;
-padding: 2em;
+.form--wrapper {
+  width: 600px;
+  width: 600px;
+  padding: 2em;
 }
 
-.field--wrapper{
-display: flex;
-flex-direction: column;
-gap: 1em;
-padding: 0.5em 0;
+.field--wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 0.5em 0;
 }
 
-
-
+.password--span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 /* Form Input Styling */
 
-input[type="text"], input[type="password"], input[type="email"], textarea{
-background: var(--mainBgColor);
-border: none;
-border-bottom: 1px solid var(--borderColor1);
-padding: 1rem;
-border-radius: 3px;
-width: 100%;
-color: var(--color-light);
-outline: none;
-font-size: 18px;
-text-shadow: none !important;
-resize: none;
+input[type="text"],
+input[type="password"],
+input[type="email"],
+textarea {
+  background: var(--mainBgColor);
+  border: none;
+  border-bottom: 1px solid var(--borderColor1);
+  padding: 1rem;
+  border-radius: 3px;
+  width: 100%;
+  color: var(--color-light);
+  outline: none;
+  font-size: 18px;
+  text-shadow: none !important;
+  resize: none;
 }
-
 
 /* Button Styling */
 
-.btn{
-padding: 0.5em 1em;
-border: none;
-border-radius: 2px;
-cursor: pointer;
-transition: 0.3s;
+.btn {
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.btn--lg{
-padding: 1em 2em;
+.btn--lg {
+  padding: 1em 2em;
 }
 
-.btn--main{
-background-color: rgba(219,26,90,1);
-color: #fff;
+.btn--main {
+  background-color: rgba(219, 26, 90, 1);
+  color: #fff;
 }
 
-.btn--secondary{
-background-color: #8db3dd;
+.btn--secondary {
+  background-color: #8db3dd;
 }
 
-.btn:hover{
-opacity: 0.7;
+.btn:hover {
+  opacity: 0.7;
 }
 
 /* Header Styling */
 
-#header--wrapper{
-background-color: var(--mainBgColor);
-padding: 1em;
-display: flex;
-justify-content: space-between;
-border-radius: 10px 10px 0 0;
-border:1px solid var(--borderColor1);
-border-bottom: none;
+#header--wrapper {
+  background-color: var(--mainBgColor);
+  padding: 1em;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 10px 10px 0 0;
+  border: 1px solid var(--borderColor1);
+  border-bottom: none;
 }
 
-.header--link{
-color: #c7d8eb;
-cursor: pointer;
-transition: 0.3s;
+.header--link {
+  color: #c7d8eb;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.header--link:hover{
-color: #8db3dd;
+.header--link:hover {
+  color: #8db3dd;
 }
 
 /* Room Styling */
 
-.room--container{
-padding: 2em;
-background-color: var(--secondaryBgColor);
-border-radius: 0 0 10px 10px;
-border:1px solid var(--borderColor1);
+.room--container {
+  padding: 2em;
+  background-color: var(--secondaryBgColor);
+  border-radius: 0 0 10px 10px;
+  border: 1px solid var(--borderColor1);
 }
 
-#message--form{
-display: flex;
-flex-direction: column;
-gap: 0.5em;
+#message--form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+.messages--container{
+  overflow: scroll;
+  height: 100vh;
+}
+.send-btn--wrapper {
+  display: flex;
+  justify-content: flex-end;
 }
 
-.send-btn--wrapper{
-display: flex;
-justify-content: flex-end;
+.message--wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.5em;
+  margin: 1em;
 }
 
-.message--wrapper{
-display: flex;
-flex-wrap: wrap;
-flex-direction: column;
-gap: 0.5em;
-margin:1em;
+.message--header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.message--header{
-display: flex;
-justify-content: space-between;
-align-items: center;
+.message--body {
+  padding: 0.5em 0;
+  color: var(--textColorSecondary);
+  background-color: var(--themeColorMain);
+  padding: 1em;
+  border-radius: 20px;
+  width: fit-content;
+  max-width: 100%;
+  word-wrap: break-word; /* added */
 }
 
-.message--body{
-padding: 0.5em 0;
-color: var(--textColorSecondary);
-background-color: var(--themeColorMain);
-padding: 1em;
-border-radius: 20px;
-width:fit-content;
-max-width: 100%;
-word-wrap: break-word; /* added */
+.message--body--owner {
+  border: 1px solid rgba(219, 26, 90, 1);
+  background-color: var(--secondaryBgColor);
 }
 
-.message--body--owner{
-border: 1px solid rgba(219,26,90,1);
-background-color: var(--secondaryBgColor);
+.message-timestamp {
+  margin-left: 1em;
+  color: rgb(164, 161, 161);
 }
 
-.message-timestamp{
-margin-left: 1em;
-color: rgb(164, 161, 161);
+.delete--btn {
+  color: #8db3dd;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 16px;
 }
 
-.delete--btn{
-color:#8db3dd;
-cursor: pointer;
-transition: 0.3s;
-width: 16px;
-}
-
-.delete--btn:hover{
-color:red;
+.delete--btn:hover {
+  color: red;
 }

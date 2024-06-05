@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useContext } from "react";
 import { account } from "../appwriteConfig";
 import { useNavigate } from "react-router-dom";
 import { ID } from "appwrite";
+import Loader from "../components/Loader";
 
 const AuthContext = createContext();
 
@@ -52,6 +53,10 @@ export const AuthProvider = ({ children }) => {
       alert("Passwords do not match");
       return;
     }
+    if (credentials.password1.length < 8) {
+      alert("Password must be at least 8 characters");
+      return;
+    }
     try {
       let respone = await account.create(
         ID.unique(),
@@ -80,7 +85,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={contextData}>
-      {loading ? <p>Loading...</p> : children}
+      {loading ? <Loader /> : children}
     </AuthContext.Provider>
   );
 };
