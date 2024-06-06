@@ -14,6 +14,8 @@ const Heart = () => {
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [documentIDforLikesCount, setdocumentIDforLikesCount] = useState(null);
+  const [updating, setUpdating] = useState(false);
+
   useEffect(() => {
     fetchUserAttributes();
     fetchLikesCount();
@@ -21,13 +23,11 @@ const Heart = () => {
     const unsubscribe = client.subscribe(
       `databases.${DATABASE_ID}.collections.${COLLECTION_ID_LIKES}.documents`,
       (response) => {
-        // console.log(response.payload.LikesCount);
         if (
           response.events.includes(
             "databases.*.collections.*.documents.*.update"
           )
         ) {
-          // console.log("ITEM Updated");
           setLikesCount(response.payload.LikesCount);
         }
       }
@@ -44,10 +44,10 @@ const Heart = () => {
       const response = await databases.listDocuments(
         DATABASE_ID,
         COLLECTION_ID_MESSAGE,
-        [Query.equal("user_id", user.$id)]
+        [Query.equal("user_id", user.$id), Query.orderDesc("$createdAt")]
       );
 
-      if (response.documents.length > 0) {
+      if (response.total >= 0) {
         const userDoc = response.documents[0];
         setLiked(userDoc.like);
       } else {
@@ -58,6 +58,9 @@ const Heart = () => {
     }
   };
   const handleHeartClicked = async () => {
+    if (updating) return;
+    setUpdating(true);
+
     const newLikedStatus = !liked;
     setLiked(newLikedStatus);
 
@@ -65,10 +68,10 @@ const Heart = () => {
       const response = await databases.listDocuments(
         DATABASE_ID,
         COLLECTION_ID_MESSAGE,
-        [Query.equal("user_id", user.$id)]
+        [Query.equal("user_id", user.$id), Query.orderDesc("$createdAt")]
       );
 
-      if (response.documents.length > 0) {
+      if (response.total >= 0) {
         const userDoc = response.documents[0];
         setLiked(newLikedStatus);
         updateLikedStatusInDatabase(userDoc.$id, newLikedStatus);
@@ -83,6 +86,8 @@ const Heart = () => {
       }
     } catch (error) {
       console.error("Error handling heart click:", error);
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -107,9 +112,11 @@ const Heart = () => {
         COLLECTION_ID_LIKES,
         []
       );
-      if (response.documents.length > 0) {
+      if (response.total >= 0) {
         setLikesCount(response.documents[0].LikesCount);
         setdocumentIDforLikesCount(response.documents[0].$id);
+      } else {
+        console.error("Failed to fetch likes count. Response:", response);
       }
     } catch (error) {
       console.error("Error fetching likes count:", error);
@@ -117,7 +124,7 @@ const Heart = () => {
   };
   const addLike = async () => {
     try {
-      await databases.updateDocument(
+      const response = await databases.updateDocument(
         DATABASE_ID,
         COLLECTION_ID_LIKES,
         documentIDforLikesCount,
