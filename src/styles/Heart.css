@@ -1,9 +1,11 @@
+@import url("../index.css");
 .Heart--Container{
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   padding: 1rem;
+  color: var(--textColorSecondary);
 }
 .Heart--Counter--Container{
   margin-left: 10px;

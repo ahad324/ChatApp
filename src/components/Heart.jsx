@@ -27,7 +27,7 @@ const Heart = () => {
             "databases.*.collections.*.documents.*.update"
           )
         ) {
-          console.log("ITEM Updated");
+          // console.log("ITEM Updated");
           setLikesCount(response.payload.LikesCount);
         }
       }
