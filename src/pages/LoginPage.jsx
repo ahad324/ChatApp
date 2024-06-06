@@ -4,15 +4,12 @@ import { useNavigate, Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Eye, EyeOff } from "react-feather";
-import Loader from "../components/Loader";
 
 function LoginPage() {
   const { user, handleUserLogin } = useAuth();
   const navigate = useNavigate();
   const [viewPass, setviewPass] = useState("password");
   const [credentials, setcredentials] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     if (user) {
       navigate("/");
@@ -28,28 +25,20 @@ function LoginPage() {
     });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await handleUserLogin(e, credentials);
+
+    if (response.error) {
+      toast.error("Invalid email or password. Please try again.");
+    }
+  };
+
   const toggleViewPassword = () => {
     setviewPass((prevState) =>
       prevState === "password" ? "text" : "password"
     );
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      await handleUserLogin(e, credentials);
-    } catch (error) {
-      toast.error("Invalid email or password. Please try again.");
-    }
-
-    setLoading(false);
-  };
-  if (loading) {
-    return <Loader />;
-  }
-
   return (
     <div className="auth--container">
       <div className="form--wrapper">

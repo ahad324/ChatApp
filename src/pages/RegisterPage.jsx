@@ -4,13 +4,11 @@ import { useAuth } from "../utils/AuthContext";
 import { Eye, EyeOff } from "react-feather";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Loader from "../components/Loader";
 
 const RegisterPage = () => {
   const { handleUserRegister } = useAuth();
   const [viewPass1, setviewPass1] = useState("password");
   const [viewPass2, setviewPass2] = useState("password");
-  const [loading, setLoading] = useState(false);
 
   const [credentials, setcredentials] = useState({
     name: "",
@@ -43,29 +41,24 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     if (credentials.name.length < 3) {
       toast.error("Name must be at least 3 characters");
-      setLoading(false);
       return;
     }
 
     if (!credentials.email.includes("@")) {
       toast.error("Invalid email format");
-      setLoading(false);
       return;
     }
 
     if (credentials.password1.length < 8) {
       toast.error("Password must be at least 8 characters");
-      setLoading(false);
       return;
     }
 
     if (credentials.password1 !== credentials.password2) {
       toast.error("Passwords do not match");
-      setLoading(false);
       return;
     }
 
@@ -74,13 +67,7 @@ const RegisterPage = () => {
     } catch (error) {
       toast.error("Failed to register. Please try again later.");
     }
-
-    setLoading(false);
   };
-
-  if (loading) {
-    return <Loader />;
-  }
 
   return (
     <div className="auth--container">
