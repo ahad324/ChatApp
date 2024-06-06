@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ID, Query, Role, Permission } from "appwrite";
-import { Trash2, Edit } from "react-feather";
+import { Trash2, Edit, Send } from "react-feather";
+import { format, isToday, isYesterday } from "date-fns";
 import Header from "../components/Header";
 import Heart from "../components/Heart";
 import client, {
@@ -14,6 +15,11 @@ function Room() {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [messageBody, setmessageBody] = useState("");
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     getMessages();
@@ -28,7 +34,7 @@ function Room() {
           )
         ) {
           // console.log("ITEM CREATED");
-          setMessages((prevState) => [response.payload, ...prevState]);
+          setMessages((prevState) => [...prevState, response.payload]);
         }
         if (
           response.events.includes(
@@ -55,7 +61,7 @@ function Room() {
               prevState[index] = response.payload;
               return [...prevState];
             } else {
-              // If not found, return the previous state as is
+              // If not found, returning the previous state
               return prevState;
             }
           });
@@ -67,6 +73,9 @@ function Room() {
       unsubscribe();
     };
   }, []);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,7 +94,6 @@ function Room() {
       payload,
       permissions
     );
-
     setmessageBody("");
   };
 
@@ -94,7 +102,7 @@ function Room() {
       const response = await databases.listDocuments(
         DATABASE_ID,
         COLLECTION_ID_MESSAGE,
-        [Query.orderDesc("$createdAt")]
+        [Query.orderAsc("$createdAt")]
       );
       if (response.documents) {
         setMessages(response.documents);
@@ -126,12 +134,88 @@ function Room() {
     }
   };
 
+  const renderMessagesByCategory = (categoryMessages, category) => {
+    if (categoryMessages.length > 0) {
+      return (
+        <>
+          <span className="Category--Messages--Text--Span">
+            <p>{category}</p>
+          </span>
+          <div className="messages--container">
+            {categoryMessages.map((message) => (
+              <div key={message.$id} className="message--wrapper">
+                <div className="message--header">
+                  <p>
+                    {message?.username ? (
+                      <span>{message.username}</span>
+                    ) : (
+                      <span>Anonymous User</span>
+                    )}
+                    <small className="message-timestamp">
+                      {new Date(message.$createdAt).toLocaleTimeString()}
+                    </small>
+                  </p>
+                  <span className="Edit--Delete--Icons--Span">
+                    {message.$permissions.includes(
+                      `delete(\"user:${user.$id}\")`
+                    ) && (
+                      <Trash2
+                        className="delete--btn"
+                        onClick={() => {
+                          deleteMessage(message.$id);
+                        }}
+                      />
+                    )}
+                    {message.$permissions.includes(
+                      `update(\"user:${user.$id}\")`
+                    ) && (
+                      <Edit
+                        className="edit--btn"
+                        onClick={() => {
+                          const editedMessage = prompt(
+                            "Enter your edited message:"
+                          );
+                          if (editedMessage !== null) {
+                            editMessage(message.$id, editedMessage);
+                          }
+                        }}
+                      />
+                    )}
+                  </span>
+                </div>
+                <div className="message--body">{message.body}</div>
+                <div ref={messagesEndRef} />
+              </div>
+            ))}
+          </div>
+        </>
+      );
+    }
+    return null;
+  };
+
+  const todayMessages = messages.filter((message) =>
+    isToday(new Date(message.$createdAt))
+  );
+  const yesterdayMessages = messages.filter((message) =>
+    isYesterday(new Date(message.$createdAt))
+  );
+  const olderMessages = messages.filter(
+    (message) =>
+      !isToday(new Date(message.$createdAt)) &&
+      !isYesterday(new Date(message.$createdAt))
+  );
+
   return (
     <main className="container">
       <Header />
+
       <div className="room--container">
+        {renderMessagesByCategory(todayMessages, "Today")}
+        {renderMessagesByCategory(yesterdayMessages, "Yesterday")}
+        {renderMessagesByCategory(olderMessages, "Previous")}
         <form onSubmit={handleSubmit} id="message--form">
-          <div>
+          <div className="Message--Send--Container">
             <textarea
               required
               maxLength="1000"
@@ -142,58 +226,13 @@ function Room() {
               value={messageBody}
               id="textarea"
             ></textarea>
-          </div>
-          <div className="send-btn--wrapper">
-            <input className="btn btn--secondary" type="submit" value="Send" />
+            <div className="send-btn--wrapper">
+              <button className="btn btn--secondary" type="submit">
+                <Send />
+              </button>
+            </div>
           </div>
         </form>
-
-        <div className="messages--container">
-          {messages.map((message) => (
-            <div key={message.$id} className="message--wrapper">
-              <div className="message--header">
-                <p>
-                  {message?.username ? (
-                    <span>{message.username}</span>
-                  ) : (
-                    <span>Anonymouse User</span>
-                  )}
-                  <small className="message-timestamp">
-                    {new Date(message.$createdAt).toLocaleString()}
-                  </small>
-                </p>
-                <span className="Edit--Delete--Icons--Span">
-                  {message.$permissions.includes(
-                    `delete(\"user:${user.$id}\")`
-                  ) && (
-                    <Trash2
-                      className="delete--btn"
-                      onClick={() => {
-                        deleteMessage(message.$id);
-                      }}
-                    />
-                  )}
-                  {message.$permissions.includes(
-                    `delete(\"user:${user.$id}\")`
-                  ) && (
-                    <Edit
-                      className="edit--btn"
-                      onClick={() => {
-                        const editedMessage = prompt(
-                          "Enter your edited message:"
-                        );
-                        if (editedMessage !== null) {
-                          editMessage(message.$id, editedMessage);
-                        }
-                      }}
-                    />
-                  )}
-                </span>
-              </div>
-              <div className="message--body">{message.body}</div>
-            </div>
-          ))}
-        </div>
       </div>
       <Heart />
     </main>

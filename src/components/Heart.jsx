@@ -60,29 +60,35 @@ const Heart = () => {
   const handleHeartClicked = async () => {
     const newLikedStatus = !liked;
     setLiked(newLikedStatus);
-    if (newLikedStatus) {
-      setLikesCount(likesCount + 1);
-      await addLike();
-    } else {
-      setLikesCount(likesCount - 1);
-      await removeLike();
-    }
-    const response = await databases.listDocuments(
-      DATABASE_ID,
-      COLLECTION_ID_MESSAGE,
-      [Query.equal("user_id", user.$id)]
-    );
 
-    if (response.documents.length > 0) {
-      const userDoc = response.documents[0];
-      setLiked(newLikedStatus);
-      updateLikedStatusInDatabase(userDoc.$id, newLikedStatus);
+    try {
+      const response = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTION_ID_MESSAGE,
+        [Query.equal("user_id", user.$id)]
+      );
+
+      if (response.documents.length > 0) {
+        const userDoc = response.documents[0];
+        setLiked(newLikedStatus);
+        updateLikedStatusInDatabase(userDoc.$id, newLikedStatus);
+
+        if (newLikedStatus) {
+          setLikesCount((prevLikes) => prevLikes + 1);
+          await addLike();
+        } else {
+          setLikesCount((prevLikes) => Math.max(0, prevLikes - 1));
+          await removeLike();
+        }
+      }
+    } catch (error) {
+      console.error("Error handling heart click:", error);
     }
   };
 
   const updateLikedStatusInDatabase = async (documentId, newLikedStatus) => {
     try {
-      const updatedDocument = await databases.updateDocument(
+      await databases.updateDocument(
         DATABASE_ID,
         COLLECTION_ID_MESSAGE,
         documentId,
@@ -121,6 +127,7 @@ const Heart = () => {
       );
     } catch (error) {
       console.error("Error adding like:", error);
+      setLikesCount((prevLikes) => prevLikes - 1);
     }
   };
   const removeLike = async () => {
@@ -130,11 +137,12 @@ const Heart = () => {
         COLLECTION_ID_LIKES,
         documentIDforLikesCount,
         {
-          LikesCount: likesCount - 1,
+          LikesCount: Math.max(0, likesCount - 1),
         }
       );
     } catch (error) {
       console.error("Error removing like:", error);
+      setLikesCount((prevLikes) => prevLikes + 1);
     }
   };
   return (

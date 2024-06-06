@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Revalia&family=Tiny5&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Revalia&family=Tiny5&display=swap");
 * {
   margin: 0;
   padding: 0;
@@ -6,8 +6,8 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 
-    font-family: "Kanit", sans-serif;
-    font-weight: 500;
+  font-family: "Kanit", sans-serif;
+  font-weight: 500;
 
   scrollbar-width: thin;
   scrollbar-color: var(--themeColorMain) var(--secondaryBgColor);
@@ -23,13 +23,13 @@
   --textColorSecondary: rgb(226, 227, 232);
   --themeColorMain: rgba(219, 26, 90, 1);
   --themeColorSecondary: #386fd2;
+  --shadow: 0px 10px 39px 8px rgba(0, 0, 0, 0.3);
 }
-body.dark-theme{
-
-    --mainBgColor: rgb(179 179 201);
-    .Heart--Container{
-      color: var(--secondaryBgColor);
-    }
+body.dark-theme {
+  --mainBgColor: rgb(179 179 201);
+  .Heart--Container {
+    color: var(--secondaryBgColor);
+  }
 }
 body {
   background-color: var(--mainBgColor);
@@ -84,13 +84,14 @@ a {
 .container {
   max-width: 600px;
   margin: 20px auto;
-  box-shadow: 0px 10px 39px 8px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow);
 }
 .controls {
   margin: 20px;
 }
 
-.controls button, .controls select {
+.controls button,
+.controls select {
   padding: 10px;
   margin-right: 10px;
   font-size: 16px;
@@ -141,7 +142,10 @@ textarea {
   text-shadow: none !important;
   resize: none;
 }
-
+textarea {
+  width: 80%;
+  overflow: auto;
+}
 /* Button Styling */
 
 .btn {
@@ -150,7 +154,7 @@ textarea {
   border-radius: 2px;
   cursor: pointer;
   transition: 0.3s;
-  box-shadow: 0px 10px 39px 8px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow);
 }
 
 .btn--lg {
@@ -164,6 +168,10 @@ textarea {
 
 .btn--secondary {
   background-color: #8db3dd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50px;
 }
 
 .btn:hover {
@@ -206,9 +214,24 @@ textarea {
   flex-direction: column;
   gap: 0.5em;
 }
+.Category--Messages--Text--Span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 10vh;
+}
 .messages--container {
   overflow: scroll;
   max-height: 100dvh;
+  box-shadow: inset var(--shadow);
+  border-radius: 5px;
+  overflow: auto;
+}
+.Message--Send--Container {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-top: 1pc;
 }
 .send-btn--wrapper {
   display: flex;
@@ -239,7 +262,6 @@ textarea {
   max-width: 100%;
   word-wrap: break-word; /* added */
 }
-
 .message--body--owner {
   border: 1px solid rgba(219, 26, 90, 1);
   background-color: var(--secondaryBgColor);
