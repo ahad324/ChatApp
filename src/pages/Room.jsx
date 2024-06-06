@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ID, Query, Role, Permission } from "appwrite";
 import { Trash2 } from "react-feather";
 import Header from "../components/Header";
+import Heart from "../components/Heart";
 import client, {
   databases,
   DATABASE_ID,
@@ -53,6 +54,7 @@ function Room() {
       user_id: user.$id,
       username: user.name,
       body: messageBody,
+      like: false,
     };
     let permissions = [Permission.write(Role.user(user.$id))];
     let response = await databases.createDocument(
@@ -143,6 +145,7 @@ function Room() {
           ))}
         </div>
       </div>
+      <Heart />
     </main>
   );
 }
