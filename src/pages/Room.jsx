@@ -53,7 +53,6 @@ function Room() {
             if (index !== -1) {
               // If found, update the message at that index
               prevState[index] = response.payload;
-              console.log(response.payload);
               return [...prevState];
             } else {
               // If not found, return the previous state as is
