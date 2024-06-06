@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ID, Query, Role, Permission } from "appwrite";
-import { Trash2 } from "react-feather";
+import { Trash2, Edit } from "react-feather";
 import Header from "../components/Header";
 import Heart from "../components/Heart";
 import client, {
@@ -21,6 +21,7 @@ function Room() {
     const unsubscribe = client.subscribe(
       `databases.${DATABASE_ID}.collections.${COLLECTION_ID_MESSAGE}.documents`,
       (response) => {
+        // console.log(response);
         if (
           response.events.includes(
             "databases.*.collections.*.documents.*.create"
@@ -38,6 +39,27 @@ function Room() {
           setMessages((prevState) =>
             prevState.filter((message) => message.$id !== response.payload.$id)
           );
+        }
+        if (
+          response.events.includes(
+            "databases.*.collections.*.documents.*.update"
+          )
+        ) {
+          setMessages((prevState) => {
+            // Find the index of the message to update
+            const index = prevState.findIndex(
+              (message) => message.$id === response.payload.$id
+            );
+            if (index !== -1) {
+              // If found, update the message at that index
+              prevState[index] = response.payload;
+              console.log(response.payload);
+              return [...prevState];
+            } else {
+              // If not found, return the previous state as is
+              return prevState;
+            }
+          });
         }
       }
     );
@@ -92,6 +114,18 @@ function Room() {
       message_id
     );
   };
+  const editMessage = async (message_id, editedMessage) => {
+    try {
+      const UpdatedMessage = await databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_ID_MESSAGE,
+        message_id,
+        { body: editedMessage }
+      );
+    } catch (error) {
+      console.error("Error updating like status:", error);
+    }
+  };
 
   return (
     <main className="container">
@@ -129,16 +163,33 @@ function Room() {
                     {new Date(message.$createdAt).toLocaleString()}
                   </small>
                 </p>
-                {message.$permissions.includes(
-                  `delete(\"user:${user.$id}\")`
-                ) && (
-                  <Trash2
-                    className="delete--btn"
-                    onClick={() => {
-                      deleteMessage(message.$id);
-                    }}
-                  />
-                )}
+                <span className="Edit--Delete--Icons--Span">
+                  {message.$permissions.includes(
+                    `delete(\"user:${user.$id}\")`
+                  ) && (
+                    <Trash2
+                      className="delete--btn"
+                      onClick={() => {
+                        deleteMessage(message.$id);
+                      }}
+                    />
+                  )}
+                  {message.$permissions.includes(
+                    `delete(\"user:${user.$id}\")`
+                  ) && (
+                    <Edit
+                      className="edit--btn"
+                      onClick={() => {
+                        const editedMessage = prompt(
+                          "Enter your edited message:"
+                        );
+                        if (editedMessage !== null) {
+                          editMessage(message.$id, editedMessage);
+                        }
+                      }}
+                    />
+                  )}
+                </span>
               </div>
               <div className="message--body">{message.body}</div>
             </div>

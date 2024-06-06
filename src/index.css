@@ -36,7 +36,7 @@
   padding: 0;
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-  Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 
   scrollbar-width: thin;
   scrollbar-color: var(--themeColorMain) var(--secondaryBgColor);
@@ -165,7 +165,7 @@ textarea {
   flex-direction: column;
   gap: 0.5em;
 }
-.messages--container{
+.messages--container {
   overflow: scroll;
   height: 100vh;
 }
@@ -208,14 +208,22 @@ textarea {
   margin-left: 1em;
   color: rgb(164, 161, 161);
 }
-
-.delete--btn {
+.Edit--Delete--Icons--Span {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 80px;
+}
+.delete--btn,
+.edit--btn {
   color: #8db3dd;
   cursor: pointer;
   transition: 0.3s;
   width: 16px;
 }
-
+.edit--btn:hover {
+  color: var(--themeColorSecondary);
+}
 .delete--btn:hover {
   color: red;
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Heart.css";
 import { useAuth } from "../utils/AuthContext";
-import {
+import client, {
   databases,
   DATABASE_ID,
   COLLECTION_ID_MESSAGE,
@@ -17,6 +17,25 @@ const Heart = () => {
   useEffect(() => {
     fetchUserAttributes();
     fetchLikesCount();
+
+    const unsubscribe = client.subscribe(
+      `databases.${DATABASE_ID}.collections.${COLLECTION_ID_LIKES}.documents`,
+      (response) => {
+        // console.log(response.payload.LikesCount);
+        if (
+          response.events.includes(
+            "databases.*.collections.*.documents.*.update"
+          )
+        ) {
+          console.log("ITEM Updated");
+          setLikesCount(response.payload.LikesCount);
+        }
+      }
+    );
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   // Heart Like / Dislike Logic/Code
