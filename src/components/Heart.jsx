@@ -4,22 +4,24 @@ import { useAuth } from "../utils/AuthContext";
 import client, {
   databases,
   DATABASE_ID,
-  COLLECTION_ID_MESSAGE,
+  COLLECTION_ID_USER_LIKES,
   COLLECTION_ID_LIKES,
 } from "../appwriteConfig";
-import { Query } from "appwrite";
+import { ID, Query } from "appwrite";
 
 const Heart = () => {
   const { user } = useAuth();
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
-  const [documentIDforLikesCount, setdocumentIDforLikesCount] = useState(null);
+  const [documentIDforLikesCount, setDocumentIDforLikesCount] = useState(null);
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
-    fetchUserAttributes();
+    fetchUserLikeStatus();
     fetchLikesCount();
+  }, []);
 
+  useEffect(() => {
     const unsubscribe = client.subscribe(
       `databases.${DATABASE_ID}.collections.${COLLECTION_ID_LIKES}.documents`,
       (response) => {
@@ -38,51 +40,33 @@ const Heart = () => {
     };
   }, []);
 
-  // Heart Like / Dislike Logic/Code
-  const fetchUserAttributes = async () => {
+  const fetchUserLikeStatus = async () => {
     try {
       const response = await databases.listDocuments(
         DATABASE_ID,
-        COLLECTION_ID_MESSAGE,
-        [Query.equal("user_id", user.$id), Query.orderDesc("$createdAt")]
+        COLLECTION_ID_USER_LIKES,
+        [Query.equal("user_id", user.$id)]
       );
 
-      if (response.total >= 0) {
-        const userDoc = response.documents[0];
-        setLiked(userDoc.like);
+      if (response.total > 0) {
+        setLiked(true);
       } else {
-        console.error("Failed to fetch Like Status. Response:", response);
+        setLiked(false);
       }
     } catch (error) {
-      console.error("Error checking if liked:", error);
+      console.error("Error fetching user like status:", error);
     }
   };
+
   const handleHeartClicked = async () => {
     if (updating) return;
     setUpdating(true);
 
-    const newLikedStatus = !liked;
-    setLiked(newLikedStatus);
-
     try {
-      const response = await databases.listDocuments(
-        DATABASE_ID,
-        COLLECTION_ID_MESSAGE,
-        [Query.equal("user_id", user.$id), Query.orderDesc("$createdAt")]
-      );
-
-      if (response.total >= 0) {
-        const userDoc = response.documents[0];
-        setLiked(newLikedStatus);
-        updateLikedStatusInDatabase(userDoc.$id, newLikedStatus);
-
-        if (newLikedStatus) {
-          setLikesCount((prevLikes) => prevLikes + 1);
-          await addLike();
-        } else {
-          setLikesCount((prevLikes) => Math.max(0, prevLikes - 1));
-          await removeLike();
-        }
+      if (!liked) {
+        await addLike();
+      } else {
+        await removeLike();
       }
     } catch (error) {
       console.error("Error handling heart click:", error);
@@ -91,20 +75,62 @@ const Heart = () => {
     }
   };
 
-  const updateLikedStatusInDatabase = async (documentId, newLikedStatus) => {
+  const addLike = async () => {
     try {
+      await databases.createDocument(
+        DATABASE_ID,
+        COLLECTION_ID_USER_LIKES,
+        ID.unique(),
+        { user_id: user.$id, liked: true }
+      );
+
       await databases.updateDocument(
         DATABASE_ID,
-        COLLECTION_ID_MESSAGE,
-        documentId,
-        { like: newLikedStatus }
+        COLLECTION_ID_LIKES,
+        documentIDforLikesCount,
+        { LikesCount: likesCount + 1 }
       );
+
+      setLiked(true);
+      setLikesCount((prevLikes) => prevLikes + 1);
     } catch (error) {
-      console.error("Error updating like status:", error);
+      console.error("Error adding like:", error);
     }
   };
 
-  // Likes Counter Logic/Code
+  const removeLike = async () => {
+    try {
+      const userLikeResponse = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTION_ID_USER_LIKES,
+        [Query.equal("user_id", user.$id)]
+      );
+
+      if (userLikeResponse.total > 0) {
+        const userLikeDocumentId = userLikeResponse.documents[0].$id;
+
+        await databases.deleteDocument(
+          DATABASE_ID,
+          COLLECTION_ID_USER_LIKES,
+          userLikeDocumentId
+        );
+        await databases.updateDocument(
+          DATABASE_ID,
+          COLLECTION_ID_LIKES,
+          documentIDforLikesCount,
+          { LikesCount: Math.max(0, likesCount - 1) }
+        );
+
+        setLiked(false);
+        setLikesCount((prevLikes) => Math.max(0, prevLikes - 1));
+      } else {
+        console.error("User like document not found for deletion");
+      }
+    } catch (error) {
+      console.error("Error removing like:", error);
+    }
+  };
+
   const fetchLikesCount = async () => {
     try {
       const response = await databases.listDocuments(
@@ -112,44 +138,14 @@ const Heart = () => {
         COLLECTION_ID_LIKES,
         []
       );
-      if (response.total >= 0) {
+      if (response.total > 0) {
         setLikesCount(response.documents[0].LikesCount);
-        setdocumentIDforLikesCount(response.documents[0].$id);
+        setDocumentIDforLikesCount(response.documents[0].$id);
       } else {
         console.error("Failed to fetch likes count. Response:", response);
       }
     } catch (error) {
       console.error("Error fetching likes count:", error);
-    }
-  };
-  const addLike = async () => {
-    try {
-      const response = await databases.updateDocument(
-        DATABASE_ID,
-        COLLECTION_ID_LIKES,
-        documentIDforLikesCount,
-        {
-          LikesCount: likesCount + 1,
-        }
-      );
-    } catch (error) {
-      console.error("Error adding like:", error);
-      setLikesCount((prevLikes) => prevLikes - 1);
-    }
-  };
-  const removeLike = async () => {
-    try {
-      await databases.updateDocument(
-        DATABASE_ID,
-        COLLECTION_ID_LIKES,
-        documentIDforLikesCount,
-        {
-          LikesCount: Math.max(0, likesCount - 1),
-        }
-      );
-    } catch (error) {
-      console.error("Error removing like:", error);
-      setLikesCount((prevLikes) => prevLikes + 1);
     }
   };
   return (
@@ -196,7 +192,9 @@ const Heart = () => {
             </svg>
           </div>
         </div>
-        <strong>{likesCount}</strong>
+        <div className="Heart--Counter">
+          <p>{likesCount}</p>
+        </div>
       </div>
     </div>
   );

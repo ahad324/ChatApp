@@ -84,10 +84,9 @@ function Room() {
       user_id: user.$id,
       username: user.name,
       body: messageBody,
-      like: false,
     };
     let permissions = [Permission.write(Role.user(user.$id))];
-    let response = await databases.createDocument(
+    const response = await databases.createDocument(
       DATABASE_ID,
       COLLECTION_ID_MESSAGE,
       ID.unique(),
@@ -211,9 +210,9 @@ function Room() {
       <Header />
 
       <div className="room--container">
-        {renderMessagesByCategory(todayMessages, "Today")}
-        {renderMessagesByCategory(yesterdayMessages, "Yesterday")}
         {renderMessagesByCategory(olderMessages, "Previous")}
+        {renderMessagesByCategory(yesterdayMessages, "Yesterday")}
+        {renderMessagesByCategory(todayMessages, "Today")}
         <form onSubmit={handleSubmit} id="message--form">
           <div className="Message--Send--Container">
             <textarea
