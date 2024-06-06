@@ -2,11 +2,15 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../utils/AuthContext";
 import { Eye, EyeOff } from "react-feather";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Loader from "../components/Loader";
 
 const RegisterPage = () => {
   const { handleUserRegister } = useAuth();
   const [viewPass1, setviewPass1] = useState("password");
   const [viewPass2, setviewPass2] = useState("password");
+  const [loading, setLoading] = useState(false);
 
   const [credentials, setcredentials] = useState({
     name: "",
@@ -18,6 +22,7 @@ const RegisterPage = () => {
   const handleInputChange = (e) => {
     let name = e.target.name;
     let value = e.target.value;
+
     setcredentials({
       ...credentials,
       [name]: value,
@@ -35,10 +40,52 @@ const RegisterPage = () => {
       prevState === "password" ? "text" : "password"
     );
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (credentials.name.length < 3) {
+      toast.error("Name must be at least 3 characters");
+      setLoading(false);
+      return;
+    }
+
+    if (!credentials.email.includes("@")) {
+      toast.error("Invalid email format");
+      setLoading(false);
+      return;
+    }
+
+    if (credentials.password1.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      setLoading(false);
+      return;
+    }
+
+    if (credentials.password1 !== credentials.password2) {
+      toast.error("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await handleUserRegister(e, credentials);
+    } catch (error) {
+      toast.error("Failed to register. Please try again later.");
+    }
+
+    setLoading(false);
+  };
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <div className="auth--container">
       <div className="form--wrapper">
-        <form onSubmit={(e) => handleUserRegister(e, credentials)}>
+        <form onSubmit={handleSubmit}>
           <div className="field--wrapper">
             <label htmlFor="Name">Name:</label>
             <input
@@ -75,9 +122,9 @@ const RegisterPage = () => {
                 onChange={handleInputChange}
               />
               {viewPass1 === "password" ? (
-                <Eye onClick={toggleViewPassword1} />
+                <Eye className="Eye" onClick={toggleViewPassword1} />
               ) : (
-                <EyeOff onClick={toggleViewPassword1} />
+                <EyeOff className="Eye" onClick={toggleViewPassword1} />
               )}
             </span>
           </div>
@@ -93,9 +140,9 @@ const RegisterPage = () => {
                 onChange={handleInputChange}
               />
               {viewPass2 === "password" ? (
-                <Eye onClick={toggleViewPassword2} />
+                <Eye className="Eye" onClick={toggleViewPassword2} />
               ) : (
-                <EyeOff onClick={toggleViewPassword2} />
+                <EyeOff className="Eye" onClick={toggleViewPassword2} />
               )}
             </span>
           </div>
@@ -111,6 +158,7 @@ const RegisterPage = () => {
           Already have an account ? Login <Link to="/login">here</Link>
         </p>
       </div>
+      <ToastContainer />
     </div>
   );
 };

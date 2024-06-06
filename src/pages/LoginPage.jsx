@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../utils/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Eye, EyeOff } from "react-feather";
+import Loader from "../components/Loader";
 
 function LoginPage() {
   const { user, handleUserLogin } = useAuth();
   const navigate = useNavigate();
+  const [viewPass, setviewPass] = useState("password");
   const [credentials, setcredentials] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (user) {
       navigate("/");
@@ -20,10 +27,33 @@ function LoginPage() {
       [name]: value,
     });
   };
+
+  const toggleViewPassword = () => {
+    setviewPass((prevState) =>
+      prevState === "password" ? "text" : "password"
+    );
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await handleUserLogin(e, credentials);
+    } catch (error) {
+      toast.error("Invalid email or password. Please try again.");
+    }
+
+    setLoading(false);
+  };
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <div className="auth--container">
       <div className="form--wrapper">
-        <form onSubmit={(e) => handleUserLogin(e, credentials)}>
+        <form onSubmit={handleSubmit}>
           <div className="field--wrapper">
             <label htmlFor="Email">Email:</label>
             <input
@@ -38,14 +68,21 @@ function LoginPage() {
           </div>
           <div className="field--wrapper">
             <label htmlFor="Password">Password:</label>
-            <input
-              type="password"
-              required
-              name="password"
-              placeholder="Enter your password..."
-              value={credentials.password}
-              onChange={handleInputChange}
-            />
+            <span className="password--span">
+              <input
+                type={viewPass}
+                required
+                name="password"
+                placeholder="Enter your password..."
+                value={credentials.password}
+                onChange={handleInputChange}
+              />
+              {viewPass === "password" ? (
+                <Eye className="Eye" onClick={toggleViewPassword} />
+              ) : (
+                <EyeOff className="Eye" onClick={toggleViewPassword} />
+              )}
+            </span>
           </div>
           <div className="field--wrapper">
             <input
@@ -59,6 +96,7 @@ function LoginPage() {
           Don't have an account ? Register <Link to="/register">here</Link>
         </p>
       </div>
+      <ToastContainer />
     </div>
   );
 }

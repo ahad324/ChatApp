@@ -290,3 +290,6 @@ textarea {
 .delete--btn:hover {
   color: red;
 }
+.Eye {
+  cursor: pointer;
+}

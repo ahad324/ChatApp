@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
       const accountDetails = await account.get();
       setUser(accountDetails);
     } catch (error) {
-      console.info(error);
+      // console.info(error);
     }
     setloading(false);
   };
@@ -33,11 +33,12 @@ export const AuthProvider = ({ children }) => {
         credentials.email,
         credentials.password
       );
-      console.log("LOGGED IN:", response);
+      // console.log("LOGGED IN:", response);
       const accountDetails = await account.get();
       setUser(accountDetails);
       navigate("/");
     } catch (error) {
+      return { error };
       // console.info(error);
     }
   };
@@ -49,14 +50,6 @@ export const AuthProvider = ({ children }) => {
 
   const handleUserRegister = async (e, credentials) => {
     e.preventDefault();
-    if (credentials.password1 !== credentials.password2) {
-      alert("Passwords do not match");
-      return;
-    }
-    if (credentials.password1.length < 8) {
-      alert("Password must be at least 8 characters");
-      return;
-    }
     try {
       let respone = await account.create(
         ID.unique(),
