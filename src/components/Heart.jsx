@@ -146,6 +146,7 @@ const Heart = () => {
             className="like"
             type="checkbox"
             title="like"
+            name="like"
             checked={liked}
             onClick={handleHeartClicked}
             readOnly
