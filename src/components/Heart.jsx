@@ -15,14 +15,18 @@ const Heart = () => {
   const [likesCount, setLikesCount] = useState(0);
   const [documentIDforLikesCount, setDocumentIDforLikesCount] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [allLikedByUsers, setAllLikedByUsers] = useState([]);
+  const [displayedLikedByUsers, setDisplayedLikedByUsers] = useState([]);
+  const [showMoreButton, setShowMoreButton] = useState(false);
 
   useEffect(() => {
     fetchUserLikeStatus();
     fetchLikesCount();
+    fetchLikedBy();
   }, []);
 
   useEffect(() => {
-    const unsubscribe = client.subscribe(
+    const likesCountUnsubscribe = client.subscribe(
       `databases.${DATABASE_ID}.collections.${COLLECTION_ID_LIKES}.documents`,
       (response) => {
         if (
@@ -35,8 +39,16 @@ const Heart = () => {
       }
     );
 
+    const likedByUnsubscribe = client.subscribe(
+      `databases.${DATABASE_ID}.collections.${COLLECTION_ID_USER_LIKES}.documents`,
+      (response) => {
+        fetchLikedBy();
+      }
+    );
+
     return () => {
-      unsubscribe();
+      likesCountUnsubscribe();
+      likedByUnsubscribe();
     };
   }, []);
 
@@ -47,7 +59,6 @@ const Heart = () => {
         COLLECTION_ID_USER_LIKES,
         [Query.equal("user_id", user.$id)]
       );
-
       if (response.total > 0) {
         setLiked(true);
       } else {
@@ -81,9 +92,8 @@ const Heart = () => {
         DATABASE_ID,
         COLLECTION_ID_USER_LIKES,
         ID.unique(),
-        { user_id: user.$id, liked: true }
+        { user_id: user.$id, liked: true, username: user.name }
       );
-
       await databases.updateDocument(
         DATABASE_ID,
         COLLECTION_ID_LIKES,
@@ -148,6 +158,35 @@ const Heart = () => {
       console.error("Error fetching likes count:", error);
     }
   };
+
+  const fetchLikedBy = async () => {
+    try {
+      const response = await databases.listDocuments(
+        DATABASE_ID,
+        COLLECTION_ID_USER_LIKES,
+        []
+      );
+
+      const likedUsers = response.documents.map((doc) => doc.username);
+      setAllLikedByUsers(likedUsers);
+
+      if (likedUsers.length > 3) {
+        setDisplayedLikedByUsers(likedUsers.slice(0, 3));
+        setShowMoreButton(true);
+      } else {
+        setDisplayedLikedByUsers(likedUsers);
+        setShowMoreButton(false);
+      }
+    } catch (error) {
+      console.error("Error fetching liked by users:", error);
+    }
+  };
+
+  const handleShowAllLikedBy = () => {
+    setDisplayedLikedByUsers(allLikedByUsers);
+    setShowMoreButton(false);
+  };
+
   return (
     <div className="Heart--Container">
       <p>Love it?</p>
@@ -194,6 +233,19 @@ const Heart = () => {
         </div>
         <div className="Heart--Counter">
           <p>{likesCount}</p>
+        </div>
+        <div className="LikedBY">
+          <p>Liked By</p>
+          <ul>
+            {displayedLikedByUsers.map((username, index) => (
+              <li key={index}>{username}</li>
+            ))}
+          </ul>
+          {showMoreButton && (
+            <button className="Show--More--Btn" onClick={handleShowAllLikedBy}>
+              Show More
+            </button>
+          )}
         </div>
       </div>
     </div>

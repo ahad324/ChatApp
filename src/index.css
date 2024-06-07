@@ -164,13 +164,13 @@ textarea {
   color: #fff;
 }
 
-.btn--secondary {
+/* .btn--secondary {
   background-color: #8db3dd;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 50px;
-}
+} */
 
 .btn:hover {
   opacity: 0.7;
@@ -200,13 +200,16 @@ textarea {
 
 /* Room Styling */
 
-.room--container {
+.room--container,
+.Room--And--form--Container {
   padding: 2em;
   background-color: var(--secondaryBgColor);
   border-radius: 0 0 10px 10px;
   border: 1px solid var(--borderColor1);
 }
-
+.Room--And--form--Container {
+  padding: 0;
+}
 #message--form {
   display: flex;
   flex-direction: column;
@@ -234,6 +237,60 @@ textarea {
 .send-btn--wrapper {
   display: flex;
   justify-content: flex-end;
+}
+
+.btn--secondary {
+  font-size: 20px;
+  background: royalblue;
+  color: white;
+  padding: 0.5em 0.5em;
+  display: flex;
+  align-items: center;
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.btn--secondary.sendingMessage {
+  font-size: 10px;
+}
+.btn--secondary span {
+  display: block;
+  margin-left: 0.3em;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn--secondary svg {
+  display: block;
+  transform-origin: center center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.btn--secondary.sendingMessage .svg-wrapper {
+  animation: fly-1 0.6s ease-in-out infinite alternate;
+}
+
+.btn--secondary.sendingMessage svg {
+  transform: translateX(1.2em) rotate(45deg) scale(1.1);
+}
+
+.btn--secondary.sendingMessage span {
+  transform: translateX(5em);
+}
+
+.btn--secondary:active {
+  transform: scale(0.95);
+}
+
+@keyframes fly-1 {
+  from {
+    transform: translateY(0.1em);
+  }
+
+  to {
+    transform: translateY(-0.1em);
+  }
 }
 
 .message--wrapper {
@@ -291,4 +348,20 @@ textarea {
 }
 .Eye {
   cursor: pointer;
+}
+.LikedBY > ul{
+  overflow: scroll;
+    max-height: 50dvh;
+}
+.LikedBY > ul > li {
+  font-size: clamp(0.7rem, 1.2069rem + -1.0345vw, 0.625rem);
+}
+.Show--More--Btn {
+  cursor: pointer;
+  font-size: clamp(0.7rem, 1.2069rem + -1.0345vw, 0.625rem);
+  background: none;
+  border: none;
+  outline: none;
+  text-decoration: underline;
+  color: blueviolet;
 }
