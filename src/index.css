@@ -349,9 +349,9 @@ textarea {
 .Eye {
   cursor: pointer;
 }
-.LikedBY > ul{
-  overflow: scroll;
-    max-height: 50dvh;
+.LikedBY > ul {
+  overflow: auto;
+  max-height: 50dvh;
 }
 .LikedBY > ul > li {
   font-size: clamp(0.7rem, 1.2069rem + -1.0345vw, 0.625rem);
