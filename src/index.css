@@ -200,15 +200,11 @@ textarea {
 
 /* Room Styling */
 
-.room--container,
-.Room--And--form--Container {
-  padding: 2em;
+.room--container {
+  padding: 1em;
   background-color: var(--secondaryBgColor);
   border-radius: 0 0 10px 10px;
   border: 1px solid var(--borderColor1);
-}
-.Room--And--form--Container {
-  padding: 0;
 }
 #message--form {
   display: flex;
@@ -219,7 +215,7 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 10vh;
+  height: 10dvh;
 }
 .messages--container {
   overflow: scroll;
@@ -240,10 +236,10 @@ textarea {
 }
 
 .btn--secondary {
-  font-size: 20px;
+  font-size: 15px;
   background: royalblue;
   color: white;
-  padding: 0.5em 0.5em;
+  padding: 0.5em;
   display: flex;
   align-items: center;
   border: none;

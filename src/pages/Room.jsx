@@ -236,12 +236,11 @@ function Room() {
   return (
     <main className="container">
       <Header />
-      <section className="Room--And--form--Container">
-        <div className="room--container">
-          {renderMessagesByCategory(olderMessages, "Previous")}
-          {renderMessagesByCategory(yesterdayMessages, "Yesterday")}
-          {renderMessagesByCategory(todayMessages, "Today")}
-        </div>
+
+      <div className="room--container">
+        {renderMessagesByCategory(olderMessages, "Previous")}
+        {renderMessagesByCategory(yesterdayMessages, "Yesterday")}
+        {renderMessagesByCategory(todayMessages, "Today")}
         <form onSubmit={handleSubmit} id="message--form">
           <div className="Message--Send--Container">
             <textarea
@@ -282,7 +281,8 @@ function Room() {
             </div>
           </div>
         </form>
-      </section>
+      </div>
+
       <Heart />
       <ToastContainer />
     </main>
