@@ -12,7 +12,15 @@ import client, {
   COLLECTION_ID_MESSAGE,
 } from "../appwriteConfig";
 import { useAuth } from "../utils/AuthContext";
+import messageSound from "../sounds/notification.mp3";
 
+const messageAudio = new Audio(messageSound);
+
+// Function to play the message sound
+const playMessageSound = () => {
+  messageAudio.currentTime = 0;
+  messageAudio.play();
+};
 function Room() {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
@@ -40,8 +48,12 @@ function Room() {
             "databases.*.collections.*.documents.*.create"
           )
         ) {
-          // console.log("ITEM CREATED");
-          setMessages((prevState) => [...prevState, response.payload]);
+          const newMessage = response.payload;
+          // Checking if the new message is from a different user
+          setMessages((prevState) => [...prevState, newMessage]);
+          if (newMessage.user_id !== user.$id) {
+            playMessageSound();
+          }
         }
         if (
           response.events.includes(
