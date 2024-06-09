@@ -105,13 +105,17 @@ function Room() {
       body: messageBody,
     };
     let permissions = [Permission.write(Role.user(user.$id))];
-    const response = await databases.createDocument(
+    const response = databases.createDocument(
       DATABASE_ID,
       COLLECTION_ID_MESSAGE,
       ID.unique(),
       payload,
       permissions
     );
+    toast.promise(response, {
+      error: "Please check your internet connection!",
+    });
+    await response;
     setsendingMessage(false);
     setmessageBody("");
   };
@@ -135,28 +139,39 @@ function Room() {
 
   const deleteMessage = async (message_id) => {
     try {
-      await databases.deleteDocument(
+      const promise = databases.deleteDocument(
         DATABASE_ID,
         COLLECTION_ID_MESSAGE,
         message_id
       );
-      toast.success("Message deleted successfully!");
+
+      toast.promise(promise, {
+        pending: "Deleting message...",
+        error: "Failed to delete message ☹",
+      });
+
+      await promise;
     } catch (error) {
-      toast.error("Failed to delete message ☹");
       console.error("Error deleting message:", error);
     }
   };
+
   const editMessage = async (message_id, editedMessage) => {
     try {
-      const UpdatedMessage = await databases.updateDocument(
+      const promise = databases.updateDocument(
         DATABASE_ID,
         COLLECTION_ID_MESSAGE,
         message_id,
         { body: editedMessage }
       );
-      toast.success("Message edited successfully!");
+
+      toast.promise(promise, {
+        pending: "Updating message...",
+        error: "Failed to edit message ☹",
+      });
+
+      await promise;
     } catch (error) {
-      toast.error("Failed to edit message ☹");
       console.error("Error updating message:", error);
     }
   };
@@ -247,6 +262,7 @@ function Room() {
               required
               maxLength="1000"
               placeholder="Say Something...."
+              autoFocus
               onChange={(e) => {
                 setmessageBody(e.target.value);
               }}
